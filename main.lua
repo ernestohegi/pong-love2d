@@ -36,6 +36,8 @@ function love.load()
 
   math.randomseed(os.time())
 
+  love.window.setTitle(config.window.title)
+
   love.graphics.setDefaultFilter('nearest', 'nearest')
 
   love.window.setMode(GAME_WIDTH, GAME_HEIGHT, {

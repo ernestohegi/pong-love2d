@@ -5,6 +5,7 @@ local config = {
   },
   paddleSpeed = 200,
   window = {
+    title = 'Love 2D Pong',
     width = 1280 * 0.8,
     height = 720 * 0.8
   },
