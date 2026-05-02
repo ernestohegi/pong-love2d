@@ -57,11 +57,15 @@ local ball = Ball.new(GAME_WIDTH / 2 - 2, GAME_HEIGHT / 2 - 2, 4, 4)
 
 function love.load()
   titleFont = love.graphics.newFont(32)
+
   math.randomseed(os.time())
+
   love.graphics.setDefaultFilter('nearest', 'nearest')
+
   love.window.setMode(GAME_WIDTH, GAME_HEIGHT, {
     vsync = true, resizable = false, fullscreen = false
   })
+
   push:setupScreen(GAME_WIDTH, GAME_HEIGHT, windowWidth, windowHeight,
     { pixelperfect = false })
 end
@@ -73,8 +77,10 @@ function love.keypressed(key)
     GAME_STATE = 'play'
   elseif key == keys.reset then
     GAME_STATE = 'start'
+
     player1.score = 0
     player2.score = 0
+
     ball:reset()
   end
 end
@@ -82,16 +88,20 @@ end
 function love.update(dt)
   player1:update(dt)
   player2:update(dt)
+
   if GAME_STATE == 'play' then ball:update(dt) end
 end
 
 function love.draw()
   push:start()
+
   love.graphics.clear(45/255, 50/255, 52/255, 1)
   love.graphics.setFont(titleFont)
+
   if GAME_STATE == 'start' then
     love.graphics.printf(title.text, title.x, title.y, title.width, title.align)
   end
+
   if GAME_STATE == 'play' then
     player1:drawScore()
     player2:drawScore()
@@ -99,5 +109,6 @@ function love.draw()
     player2:draw()
     ball:draw()
   end
+
   push:finish()
 end
