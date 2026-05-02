@@ -14,6 +14,12 @@ local title = {
   align = 'center'
 }
 
+local keys = {
+  quit = 'escape',
+  play = 'return',
+  reset = 'space'
+}
+
 local player1Keys = {
   up = 'w',
   down = 's'
@@ -65,12 +71,20 @@ PLAYER_2_SCORE = 0
 PLAYER_1_Y = paddle1.top
 PLAYER_2_Y = paddle2.top
 
+BALL_X = ball.left
+BALL_Y = ball.top
+
+BALL_DX = math.random(2) == 1 and 100 or -100
+BALL_DY = math.random(-50, 50)
+
 PADDLE_SPEED = 200
 
-local function movePaddle(y, paddleHeight, keys, dt)
-  if love.keyboard.isDown(keys.up) then
+GAME_STATE = 'start'
+
+local function movePaddle(y, paddleHeight, playerKeys, dt)
+  if love.keyboard.isDown(playerKeys.up) then
     y = y - PADDLE_SPEED * dt
-  elseif love.keyboard.isDown(keys.down) then
+  elseif love.keyboard.isDown(playerKeys.down) then
     y = y + PADDLE_SPEED * dt
   end
 
@@ -79,6 +93,8 @@ end
 
 function love.load()
   titleFont = love.graphics.newFont(32)
+
+  math.randomseed(os.time())
 
   love.graphics.setDefaultFilter('nearest', 'nearest')
 
@@ -98,14 +114,31 @@ function love.load()
 end
 
 function love.keypressed(key)
-  if key == 'escape' then
+  if key == keys.quit then
     love.event.quit()
+  end
+
+  if key == keys.play then
+    GAME_STATE = 'play'
+  elseif key == keys.reset then
+    GAME_STATE = 'start'
+    PLAYER_1_SCORE = 0
+    PLAYER_2_SCORE = 0
+    BALL_X = ball.left
+    BALL_Y = ball.top
+    BALL_DX = math.random(2) == 1 and 100 or -100
+    BALL_DY = math.random(-50, 50)
   end
 end
 
 function love.update(dt)
   PLAYER_1_Y = movePaddle(PLAYER_1_Y, paddle1.height, player1Keys, dt)
   PLAYER_2_Y = movePaddle(PLAYER_2_Y, paddle2.height, player2Keys, dt)
+
+  if GAME_STATE == 'play' then
+    BALL_X = BALL_X + BALL_DX * dt
+    BALL_Y = BALL_Y + BALL_DY * dt
+  end
 end
 
 function love.draw()
@@ -115,20 +148,24 @@ function love.draw()
   love.graphics.setFont(titleFont)
 
   -- Title
-  -- love.graphics.printf(title.text, title.x, title.y, title.width, title.align)
+  if GAME_STATE == 'start' then
+    love.graphics.printf(title.text, title.x, title.y, title.width, title.align)
+  end
 
   -- Scores
-  love.graphics.print(tostring(PLAYER_1_SCORE), player1Score.left, player1Score.top)
-  love.graphics.print(tostring(PLAYER_2_SCORE), player2Score.left, player2Score.top)
+  if GAME_STATE == 'play' then
+    love.graphics.print(tostring(PLAYER_1_SCORE), player1Score.left, player1Score.top)
+    love.graphics.print(tostring(PLAYER_2_SCORE), player2Score.left, player2Score.top)
 
-  -- Paddle 1
-  love.graphics.rectangle('fill', paddle1.left, PLAYER_1_Y, paddle1.width, paddle1.height)
+    -- Paddle 1
+    love.graphics.rectangle('fill', paddle1.left, PLAYER_1_Y, paddle1.width, paddle1.height)
 
-  -- Paddle 2
-  love.graphics.rectangle('fill', paddle2.left, PLAYER_2_Y, paddle2.width, paddle2.height)
+    -- Paddle 2
+    love.graphics.rectangle('fill', paddle2.left, PLAYER_2_Y, paddle2.width, paddle2.height)
 
-  -- Ball
-  love.graphics.rectangle('fill', ball.left, ball.top, ball.width, ball.height)
+    -- Ball
+    love.graphics.rectangle('fill', BALL_X, BALL_Y, ball.width, ball.height)
+  end
 
   push:finish()
 end
