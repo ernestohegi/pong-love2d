@@ -1,56 +1,32 @@
-GAME_WIDTH, GAME_HEIGHT = 432, 243
-PADDLE_SPEED          = 200
-
+local config = require 'config'
 local push   = require 'push'
 local Player = require 'player'
 local Ball   = require 'ball'
 
+GAME_WIDTH, GAME_HEIGHT = config.game.width, config.game.height
+PADDLE_SPEED = config.paddleSpeed
+
 local titleFont = nil
-local windowWidth  = 1280 * 0.8
-local windowHeight = 720  * 0.8
+local windowWidth  = config.window.width
+local windowHeight = config.window.height
 
 local GAME_STATE = 'start'
 
-local keys = {
-  quit  = 'escape',
-  play  = 'return',
-  reset = 'space'
-}
-
-local title = {
-  text  = 'Hello, Pong!',
-  x     = 0,
-  y     = GAME_HEIGHT / 2 - 12,
-  width = GAME_WIDTH,
-  align = 'center'
-}
-
-local player1Config = {
-  x = 10, y = 10,
-  width = 5, height = 20,
-  keys = { up = 'w', down = 's' },
-  scoreX = GAME_WIDTH / 2 - 50, scoreY = 10
-}
-
-local player2Config = {
-  x = GAME_WIDTH - 15, y = GAME_HEIGHT - 30,
-  width = 5, height = 20,
-  keys = { up = 'up', down = 'down' },
-  scoreX = GAME_WIDTH / 2 + 30, scoreY = 10
-}
+local keys = config.keys
+local title = config.title
 
 local player1 = Player.new(
-  player1Config.x, player1Config.y,
-  player1Config.width, player1Config.height,
-  player1Config.keys,
-  player1Config.scoreX, player1Config.scoreY
+  config.player1.x, config.player1.y,
+  config.player1.width, config.player1.height,
+  config.player1.keys,
+  config.player1.scoreX, config.player1.scoreY
 )
 
 local player2 = Player.new(
-  player2Config.x, player2Config.y,
-  player2Config.width, player2Config.height,
-  player2Config.keys,
-  player2Config.scoreX, player2Config.scoreY
+  config.player2.x, config.player2.y,
+  config.player2.width, config.player2.height,
+  config.player2.keys,
+  config.player2.scoreX, config.player2.scoreY
 )
 
 local ball = Ball.new(GAME_WIDTH / 2 - 2, GAME_HEIGHT / 2 - 2, 4, 4)
