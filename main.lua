@@ -1,171 +1,103 @@
-local push = require 'push'
+GAME_WIDTH, GAME_HEIGHT = 432, 243
+PADDLE_SPEED          = 200
+
+local push   = require 'push'
+local Player = require 'player'
+local Ball   = require 'ball'
 
 local titleFont = nil
-local gameWidth, gameHeight = 432, 243
-local windowWidth, windowHeight = 1280, 720
+local windowWidth  = 1280 * 0.8
+local windowHeight = 720  * 0.8
 
-windowWidth, windowHeight = windowWidth * 0.8, windowHeight * 0.8
-
-local title = {
-  text = 'Hello, Pong!',
-  x = 0,
-  y = gameHeight / 2 - 12,
-  width = gameWidth,
-  align = 'center'
-}
+local GAME_STATE = 'start'
 
 local keys = {
-  quit = 'escape',
-  play = 'return',
+  quit  = 'escape',
+  play  = 'return',
   reset = 'space'
 }
 
-local player1Keys = {
-  up = 'w',
-  down = 's'
+local title = {
+  text  = 'Hello, Pong!',
+  x     = 0,
+  y     = GAME_HEIGHT / 2 - 12,
+  width = GAME_WIDTH,
+  align = 'center'
 }
 
-local player2Keys = {
-  up = 'up',
-  down = 'down'
+local player1Config = {
+  x = 10, y = 10,
+  width = 5, height = 20,
+  keys = { up = 'w', down = 's' },
+  scoreX = GAME_WIDTH / 2 - 50, scoreY = 10
 }
 
-local paddle1 = {
-  top = 10,
-  left = 10,
-  width = 5,
-  height = 20
+local player2Config = {
+  x = GAME_WIDTH - 15, y = GAME_HEIGHT - 30,
+  width = 5, height = 20,
+  keys = { up = 'up', down = 'down' },
+  scoreX = GAME_WIDTH / 2 + 30, scoreY = 10
 }
 
-local paddle2 = {
-  top = gameHeight - 30,
-  left = gameWidth - 15,
-  width = 5,
-  height = 20
-}
+local player1 = Player.new(
+  player1Config.x, player1Config.y,
+  player1Config.width, player1Config.height,
+  player1Config.keys,
+  player1Config.scoreX, player1Config.scoreY
+)
 
-local ball = {
-  top = gameHeight / 2 - 2,
-  left = gameWidth / 2 - 2,
-  width = 4,
-  height = 4
-}
+local player2 = Player.new(
+  player2Config.x, player2Config.y,
+  player2Config.width, player2Config.height,
+  player2Config.keys,
+  player2Config.scoreX, player2Config.scoreY
+)
 
-local player1Score = {
-  top = 10,
-  left = gameWidth / 2 - 50,
-  width = 20,
-  height = 32
-}
-
-local player2Score = {
-  top = 10,
-  left = gameWidth / 2 + 30,
-  width = 20,
-  height = 32
-}
-
-PLAYER_1_SCORE = 0
-PLAYER_2_SCORE = 0
-
-PLAYER_1_Y = paddle1.top
-PLAYER_2_Y = paddle2.top
-
-BALL_X = ball.left
-BALL_Y = ball.top
-
-BALL_DX = math.random(2) == 1 and 100 or -100
-BALL_DY = math.random(-50, 50)
-
-PADDLE_SPEED = 200
-
-GAME_STATE = 'start'
-
-local function movePaddle(y, paddleHeight, playerKeys, dt)
-  if love.keyboard.isDown(playerKeys.up) then
-    y = y - PADDLE_SPEED * dt
-  elseif love.keyboard.isDown(playerKeys.down) then
-    y = y + PADDLE_SPEED * dt
-  end
-
-  return math.max(0, math.min(y, gameHeight - paddleHeight))
-end
+local ball = Ball.new(GAME_WIDTH / 2 - 2, GAME_HEIGHT / 2 - 2, 4, 4)
 
 function love.load()
   titleFont = love.graphics.newFont(32)
-
   math.randomseed(os.time())
-
   love.graphics.setDefaultFilter('nearest', 'nearest')
-
-  love.window.setMode(
-    gameWidth, gameHeight,
-    {
-      vsync = true,
-      resizable = false,
-      fullscreen = false
-    })
-
-  push:setupScreen(
-    gameWidth, gameHeight,
-    windowWidth, windowHeight,
-    { pixelperfect = false }
-  )
+  love.window.setMode(GAME_WIDTH, GAME_HEIGHT, {
+    vsync = true, resizable = false, fullscreen = false
+  })
+  push:setupScreen(GAME_WIDTH, GAME_HEIGHT, windowWidth, windowHeight,
+    { pixelperfect = false })
 end
 
 function love.keypressed(key)
   if key == keys.quit then
     love.event.quit()
-  end
-
-  if key == keys.play then
+  elseif key == keys.play then
     GAME_STATE = 'play'
   elseif key == keys.reset then
     GAME_STATE = 'start'
-    PLAYER_1_SCORE = 0
-    PLAYER_2_SCORE = 0
-    BALL_X = ball.left
-    BALL_Y = ball.top
-    BALL_DX = math.random(2) == 1 and 100 or -100
-    BALL_DY = math.random(-50, 50)
+    player1.score = 0
+    player2.score = 0
+    ball:reset()
   end
 end
 
 function love.update(dt)
-  PLAYER_1_Y = movePaddle(PLAYER_1_Y, paddle1.height, player1Keys, dt)
-  PLAYER_2_Y = movePaddle(PLAYER_2_Y, paddle2.height, player2Keys, dt)
-
-  if GAME_STATE == 'play' then
-    BALL_X = BALL_X + BALL_DX * dt
-    BALL_Y = BALL_Y + BALL_DY * dt
-  end
+  player1:update(dt)
+  player2:update(dt)
+  if GAME_STATE == 'play' then ball:update(dt) end
 end
 
 function love.draw()
   push:start()
-
-  love.graphics.clear(45 / 255, 50 / 255, 52 / 255, 1)
+  love.graphics.clear(45/255, 50/255, 52/255, 1)
   love.graphics.setFont(titleFont)
-
-  -- Title
   if GAME_STATE == 'start' then
     love.graphics.printf(title.text, title.x, title.y, title.width, title.align)
   end
-
-  -- Scores
   if GAME_STATE == 'play' then
-    love.graphics.print(tostring(PLAYER_1_SCORE), player1Score.left, player1Score.top)
-    love.graphics.print(tostring(PLAYER_2_SCORE), player2Score.left, player2Score.top)
-
-    -- Paddle 1
-    love.graphics.rectangle('fill', paddle1.left, PLAYER_1_Y, paddle1.width, paddle1.height)
-
-    -- Paddle 2
-    love.graphics.rectangle('fill', paddle2.left, PLAYER_2_Y, paddle2.width, paddle2.height)
-
-    -- Ball
-    love.graphics.rectangle('fill', BALL_X, BALL_Y, ball.width, ball.height)
+    player1:drawScore()
+    player2:drawScore()
+    player1:draw()
+    player2:draw()
+    ball:draw()
   end
-
   push:finish()
 end
