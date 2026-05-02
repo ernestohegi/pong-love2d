@@ -1,7 +1,7 @@
-local config = require 'config'
-local push   = require 'push'
-local Player = require 'player'
-local Ball   = require 'ball'
+local push   = require 'lib.push'
+local config = require 'src.config'
+local Player = require 'src.player'
+local Ball   = require 'src.ball'
 
 GAME_WIDTH, GAME_HEIGHT = config.game.width, config.game.height
 PADDLE_SPEED = config.paddleSpeed
