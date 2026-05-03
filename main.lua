@@ -3,9 +3,6 @@ local config = require("src.config")
 local Player = require("src.player")
 local Ball = require("src.ball")
 
-GAME_WIDTH, GAME_HEIGHT = config.game.width, config.game.height
-PADDLE_SPEED = config.paddleSpeed
-
 local GAME_STATE = "start"
 
 local titleFont = nil
@@ -32,7 +29,12 @@ local player2 = Player.new(
   config.player2.scoreY
 )
 
-local ball = Ball.new(GAME_WIDTH / 2 - 2, GAME_HEIGHT / 2 - 2, 4, 4)
+local ball = Ball.new(
+  config.game.width / 2 - config.ball.width / 2,
+  config.game.height / 2 - config.ball.height / 2,
+  config.ball.width,
+  config.ball.height
+)
 
 function love.load()
   titleFont = love.graphics.newFont(32)
@@ -43,13 +45,19 @@ function love.load()
 
   love.graphics.setDefaultFilter("nearest", "nearest")
 
-  love.window.setMode(GAME_WIDTH, GAME_HEIGHT, {
+  love.window.setMode(config.game.width, config.game.height, {
     vsync = true,
     resizable = false,
     fullscreen = false,
   })
 
-  push:setupScreen(GAME_WIDTH, GAME_HEIGHT, windowWidth, windowHeight, { pixelperfect = false })
+  push:setupScreen(
+    config.game.width,
+    config.game.height,
+    windowWidth,
+    windowHeight,
+    { pixelperfect = false }
+  )
 end
 
 function love.keypressed(key)
@@ -73,13 +81,12 @@ function love.update(dt)
 
   if GAME_STATE == "play" then
     ball:update(dt)
+    ball:handleVerticalBoundaryBounce()
 
     if ball:collides(player1) then
-      ball.x = player1.x + player1.width
-      ball.dx = -ball.dx
+      ball:handlePaddleCollision(player1, "left")
     elseif ball:collides(player2) then
-      ball.x = player2.x - ball.width
-      ball.dx = -ball.dx
+      ball:handlePaddleCollision(player2, "right")
     end
   end
 end

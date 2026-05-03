@@ -3,6 +3,7 @@ local config = {
     width = 432,
     height = 243,
   },
+  speedScale = 1.6,
   paddleSpeed = 200,
   window = {
     title = "Love 2D Pong",
@@ -38,6 +39,14 @@ local config = {
     keys = { up = "up", down = "down" },
     scoreX = 432 / 2 + 30,
     scoreY = 10,
+  },
+  ball = {
+    width = 4,
+    height = 4,
+    speedX = 100,
+    speedYMin = -50,
+    speedYMax = 50,
+    bounceSpeedMultiplier = 1.07,
   },
 }
 

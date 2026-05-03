@@ -1,3 +1,5 @@
+local config = require("src.config")
+
 local Ball = {}
 Ball.__index = Ball
 
@@ -26,15 +28,39 @@ function Ball:collides(paddle)
     and paddle.y < self.y + self.height
 end
 
+function Ball:handlePaddleCollision(paddle, side)
+  if side == "left" then
+    self.x = paddle.x + paddle.width
+  elseif side == "right" then
+    self.x = paddle.x - self.width
+  else
+    return
+  end
+
+  self.dx = -self.dx * config.ball.bounceSpeedMultiplier
+end
+
+function Ball:handleVerticalBoundaryBounce()
+  if self.y <= 0 then
+    self.y = 0
+    self.dy = -self.dy
+  elseif self.y + self.height >= config.game.height then
+    self.y = config.game.height - self.height
+    self.dy = -self.dy
+  end
+end
+
 function Ball:draw()
   love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
 end
 
 function Ball:reset()
-  self.x = GAME_WIDTH / 2 - self.width / 2
-  self.y = GAME_HEIGHT / 2 - self.height / 2
-  self.dx = math.random(2) == 1 and 100 or -100
-  self.dy = math.random(-50, 50)
+  local speedScale = config.speedScale
+
+  self.x = config.game.width / 2 - self.width / 2
+  self.y = config.game.height / 2 - self.height / 2
+  self.dx = (math.random(2) == 1 and config.ball.speedX or -config.ball.speedX) * speedScale
+  self.dy = math.random(config.ball.speedYMin, config.ball.speedYMax) * speedScale
 end
 
 return Ball

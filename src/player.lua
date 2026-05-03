@@ -1,3 +1,5 @@
+local config = require("src.config")
+
 local Player = {}
 Player.__index = Player
 
@@ -15,12 +17,14 @@ function Player.new(x, y, width, height, keys, scoreX, scoreY)
 end
 
 function Player:update(dt)
+  local paddleSpeed = config.paddleSpeed * config.speedScale
+
   if love.keyboard.isDown(self.keys.up) then
-    self.y = self.y - PADDLE_SPEED * dt
+    self.y = self.y - paddleSpeed * dt
   elseif love.keyboard.isDown(self.keys.down) then
-    self.y = self.y + PADDLE_SPEED * dt
+    self.y = self.y + paddleSpeed * dt
   end
-  self.y = math.max(0, math.min(self.y, GAME_HEIGHT - self.height))
+  self.y = math.max(0, math.min(self.y, config.game.height - self.height))
 end
 
 function Player:draw()
