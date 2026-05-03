@@ -4,12 +4,9 @@ local Player = require("src.player")
 local Ball = require("src.ball")
 local UIMessages = require("src.ui_messages")
 
-local GAME_START = config.game.state.start
-local GAME_PLAY = config.game.state.play
-local GAME_FINISHED = config.game.state.finished
 local WIN_SCORE = config.game.rules.winScore
+local GAME_STATE = config.game.state.start
 
-local GAME_STATE = GAME_START
 local winner = nil
 
 local windowWidth, windowHeight = config.game.window.width, config.game.window.height
@@ -70,16 +67,16 @@ function love.keypressed(key)
   if key == keys.quit then
     love.event.quit()
   elseif key == keys.play then
-    if GAME_STATE == GAME_FINISHED then
+    if GAME_STATE == config.game.state.finished then
       player1.score = 0
       player2.score = 0
       winner = nil
       ball:reset()
     end
 
-    GAME_STATE = GAME_PLAY
+    GAME_STATE = config.game.state.play
   elseif key == keys.reset then
-    GAME_STATE = GAME_START
+    GAME_STATE = config.game.state.start
     winner = nil
 
     player1.score = 0
@@ -90,7 +87,7 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
-  if GAME_STATE == GAME_PLAY then
+  if GAME_STATE == config.game.state.play then
     player1:update(dt)
     player2:update(dt)
 
@@ -104,7 +101,7 @@ function love.update(dt)
 
       if player1.score >= WIN_SCORE then
         winner = 1
-        GAME_STATE = GAME_FINISHED
+        GAME_STATE = config.game.state.finished
         return
       end
 
@@ -115,7 +112,7 @@ function love.update(dt)
 
       if player2.score >= WIN_SCORE then
         winner = 2
-        GAME_STATE = GAME_FINISHED
+        GAME_STATE = config.game.state.finished
         return
       end
 
@@ -136,21 +133,21 @@ function love.draw()
 
   love.graphics.clear(45 / 255, 50 / 255, 52 / 255, 1)
 
-  if GAME_STATE == GAME_START then
+  if GAME_STATE == config.game.state.start then
     UIMessages.drawStart(config, WIN_SCORE)
   end
 
-  if GAME_STATE == GAME_PLAY or GAME_STATE == GAME_FINISHED then
+  if GAME_STATE == config.game.state.play or GAME_STATE == config.game.state.finished then
     UIMessages.drawScores(config, player1, player2)
   end
 
-  if GAME_STATE == GAME_PLAY then
+  if GAME_STATE == config.game.state.play then
     player1:draw()
     player2:draw()
     ball:draw()
   end
 
-  if GAME_STATE == GAME_FINISHED and winner ~= nil then
+  if GAME_STATE == config.game.state.finished and winner ~= nil then
     UIMessages.drawFinished(config, winner)
   end
 
