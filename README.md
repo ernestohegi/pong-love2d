@@ -4,7 +4,7 @@ A classic two-player Pong clone built with [LÖVE](https://love2d.org/), a 2D ga
 
 ## What it does
 
-Two players control paddles on opposite sides of the screen and try to keep the ball in play. The game displays both players' scores and runs at a fixed virtual resolution scaled up to the window size.
+Two players control paddles on opposite sides of the screen and try to score by sending the ball past the opponent. The game includes start/play/finished states, first-to-win scoring, wall and paddle collisions, and a config-driven UI system (messages, layout rhythm, and fonts).
 
 ## Technologies
 
@@ -14,11 +14,34 @@ Two players control paddles on opposite sides of the screen and try to keep the 
 
 ## Controls
 
-| Action | Player 1 | Player 2 |
-|--------|----------|----------|
-| Move up | `W` | `↑` |
-| Move down | `S` | `↓` |
-| Quit | `Escape` | — |
+| Action | Key |
+|--------|-----|
+| Player 1 up | `W` |
+| Player 1 down | `S` |
+| Player 2 up | `↑` |
+| Player 2 down | `↓` |
+| Start / Play again | `Enter` |
+| Reset to start | `Space` |
+| Quit | `Escape` |
+
+## Game flow
+
+- `start`: shows title and instructions.
+- `play`: active match with paddle movement, scoring, and collisions.
+- `finished`: triggered when a player reaches the win score (currently `3`).
+
+From `finished`:
+- `Enter` starts a fresh new match immediately.
+- `Space` resets to the start screen.
+
+## Configuration
+
+Main settings are centralized in [`src/config.lua`](src/config.lua):
+- `game`: dimensions, window, states, rules (`winScore`)
+- `tuning`: speeds and ball behavior
+- `controls`: key bindings
+- `ui`: layout rhythm, fonts, and user-facing messages
+- `entities`: paddles and ball dimensions/positions
 
 ## How to run
 
