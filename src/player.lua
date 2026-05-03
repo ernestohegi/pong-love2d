@@ -3,11 +3,14 @@ Player.__index = Player
 
 function Player.new(x, y, width, height, keys, scoreX, scoreY)
   return setmetatable({
-    x = x, y = y,
-    width = width, height = height,
+    x = x,
+    y = y,
+    width = width,
+    height = height,
     keys = keys,
-    scoreX = scoreX, scoreY = scoreY,
-    score = 0
+    scoreX = scoreX,
+    scoreY = scoreY,
+    score = 0,
   }, Player)
 end
 
@@ -21,7 +24,7 @@ function Player:update(dt)
 end
 
 function Player:draw()
-  love.graphics.rectangle('fill', self.x, self.y, self.width, self.height)
+  love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
 end
 
 function Player:drawScore()
