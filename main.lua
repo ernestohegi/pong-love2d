@@ -2,7 +2,7 @@ local push = require("lib.push")
 local config = require("src.config")
 local Player = require("src.player")
 local Ball = require("src.ball")
-local UIMessages = require("src.ui_messages")
+local UI = require("src.ui")
 
 local WIN_SCORE = config.game.rules.winScore
 local GAME_STATE = config.game.state.start
@@ -42,7 +42,7 @@ local ball = Ball.new(
 function love.load()
   love.graphics.setDefaultFilter("nearest", "nearest")
 
-  UIMessages.load(config)
+  UI.load(config)
 
   math.randomseed(os.time())
 
@@ -134,21 +134,22 @@ function love.draw()
   love.graphics.clear(45 / 255, 50 / 255, 52 / 255, 1)
 
   if GAME_STATE == config.game.state.start then
-    UIMessages.drawStart(config, WIN_SCORE)
+    UI.drawStart(config, WIN_SCORE)
   end
 
   if GAME_STATE == config.game.state.play or GAME_STATE == config.game.state.finished then
-    UIMessages.drawScores(config, player1, player2)
+    UI.drawScores(config, player1, player2)
   end
 
   if GAME_STATE == config.game.state.play then
+    UI.drawCenterDivider(config)
     player1:draw()
     player2:draw()
     ball:draw()
   end
 
   if GAME_STATE == config.game.state.finished and winner ~= nil then
-    UIMessages.drawFinished(config, winner)
+    UI.drawFinished(config, winner)
   end
 
   push:finish()

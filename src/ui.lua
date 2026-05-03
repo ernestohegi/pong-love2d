@@ -1,7 +1,7 @@
-local UIMessages = {}
+local UI = {}
 local fonts = {}
 
-function UIMessages.load(config)
+function UI.load(config)
   local fontPath = config.ui.fonts.path
   local sizes = config.ui.fonts.sizes
 
@@ -12,14 +12,25 @@ function UIMessages.load(config)
   fonts.winner = love.graphics.newFont(fontPath, sizes.winner, "mono")
 end
 
-function UIMessages.drawScores(config, player1, player2)
+function UI.drawCenterDivider(config)
+  local lineX = math.floor(config.game.width / 2) - 1
+  local segmentHeight = 6
+  local gapHeight = 6
+  local topPadding = 8
+
+  for y = topPadding, config.game.height - segmentHeight, segmentHeight + gapHeight do
+    love.graphics.rectangle("fill", lineX, y, 2, segmentHeight)
+  end
+end
+
+function UI.drawScores(config, player1, player2)
   love.graphics.setFont(fonts.score)
   player1:drawScore()
   player2:drawScore()
-  UIMessages.drawScoreLabels(config, player1, player2)
+  UI.drawScoreLabels(config, player1, player2)
 end
 
-function UIMessages.drawScoreLabels(config, player1, player2)
+function UI.drawScoreLabels(config, player1, player2)
   love.graphics.setFont(fonts.info)
   love.graphics.print(
     "Player 1",
@@ -33,7 +44,7 @@ function UIMessages.drawScoreLabels(config, player1, player2)
   )
 end
 
-function UIMessages.drawStart(config, winScore)
+function UI.drawStart(config, winScore)
   local title = config.ui.title
   local messages = config.ui.messages
   local layout = config.ui.layout
@@ -60,7 +71,7 @@ function UIMessages.drawStart(config, winScore)
   love.graphics.printf(messages.controlsHint, 0, controlsY, config.game.width, "center")
 end
 
-function UIMessages.drawFinished(config, winner)
+function UI.drawFinished(config, winner)
   local messages = config.ui.messages
   local layout = config.ui.layout
   local winnerY = config.game.height / 2 - layout.verticalRythm
@@ -79,4 +90,4 @@ function UIMessages.drawFinished(config, winner)
   love.graphics.printf(messages.restartHint, 0, promptY, config.game.width, "center")
 end
 
-return UIMessages
+return UI
