@@ -37,7 +37,7 @@ function Ball:handlePaddleCollision(paddle, side)
     return
   end
 
-  self.dx = -self.dx * config.ball.bounceSpeedMultiplier
+  self.dx = -self.dx * config.tuning.ball.bounceSpeedMultiplier
 end
 
 function Ball:handleVerticalBoundaryBounce()
@@ -50,17 +50,27 @@ function Ball:handleVerticalBoundaryBounce()
   end
 end
 
+function Ball:checkHorizontalBoundaryCross()
+  if self.x + self.width < 0 then
+    return "right"
+  elseif self.x > config.game.width then
+    return "left"
+  end
+
+  return nil
+end
+
 function Ball:draw()
   love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
 end
 
 function Ball:reset()
-  local speedScale = config.speedScale
+  local speedScale = config.tuning.speedScale
 
   self.x = config.game.width / 2 - self.width / 2
   self.y = config.game.height / 2 - self.height / 2
-  self.dx = (math.random(2) == 1 and config.ball.speedX or -config.ball.speedX) * speedScale
-  self.dy = math.random(config.ball.speedYMin, config.ball.speedYMax) * speedScale
+  self.dx = (math.random(2) == 1 and config.tuning.ball.speedX or -config.tuning.ball.speedX) * speedScale
+  self.dy = math.random(config.tuning.ball.speedYMin, config.tuning.ball.speedYMax) * speedScale
 end
 
 return Ball

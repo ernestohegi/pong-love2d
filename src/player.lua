@@ -17,7 +17,7 @@ function Player.new(x, y, width, height, keys, scoreX, scoreY)
 end
 
 function Player:update(dt)
-  local paddleSpeed = config.paddleSpeed * config.speedScale
+  local paddleSpeed = config.tuning.paddleSpeed * config.tuning.speedScale
 
   if love.keyboard.isDown(self.keys.up) then
     self.y = self.y - paddleSpeed * dt

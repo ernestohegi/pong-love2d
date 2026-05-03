@@ -2,48 +2,54 @@ local push = require("lib.push")
 local config = require("src.config")
 local Player = require("src.player")
 local Ball = require("src.ball")
+local UIMessages = require("src.ui_messages")
 
-local GAME_STATE = "start"
+local GAME_START = config.game.state.start
+local GAME_PLAY = config.game.state.play
+local GAME_FINISHED = config.game.state.finished
+local WIN_SCORE = config.game.rules.winScore
 
-local titleFont = nil
-local windowWidth, windowHeight = config.window.width, config.window.height
-local keys, title = config.keys, config.title
+local GAME_STATE = GAME_START
+local winner = nil
+
+local windowWidth, windowHeight = config.game.window.width, config.game.window.height
+local keys = config.controls
 
 local player1 = Player.new(
-  config.player1.x,
-  config.player1.y,
-  config.player1.width,
-  config.player1.height,
-  config.player1.keys,
-  config.player1.scoreX,
-  config.player1.scoreY
+  config.entities.player1.x,
+  config.entities.player1.y,
+  config.entities.player1.width,
+  config.entities.player1.height,
+  config.entities.player1.keys,
+  config.entities.player1.scoreX,
+  config.entities.player1.scoreY
 )
 
 local player2 = Player.new(
-  config.player2.x,
-  config.player2.y,
-  config.player2.width,
-  config.player2.height,
-  config.player2.keys,
-  config.player2.scoreX,
-  config.player2.scoreY
+  config.entities.player2.x,
+  config.entities.player2.y,
+  config.entities.player2.width,
+  config.entities.player2.height,
+  config.entities.player2.keys,
+  config.entities.player2.scoreX,
+  config.entities.player2.scoreY
 )
 
 local ball = Ball.new(
-  config.game.width / 2 - config.ball.width / 2,
-  config.game.height / 2 - config.ball.height / 2,
-  config.ball.width,
-  config.ball.height
+  config.game.width / 2 - config.entities.ball.width / 2,
+  config.game.height / 2 - config.entities.ball.height / 2,
+  config.entities.ball.width,
+  config.entities.ball.height
 )
 
 function love.load()
-  titleFont = love.graphics.newFont(32)
+  love.graphics.setDefaultFilter("nearest", "nearest")
+
+  UIMessages.load(config)
 
   math.randomseed(os.time())
 
-  love.window.setTitle(config.window.title)
-
-  love.graphics.setDefaultFilter("nearest", "nearest")
+  love.window.setTitle(config.game.window.title)
 
   love.window.setMode(config.game.width, config.game.height, {
     vsync = true,
@@ -64,9 +70,17 @@ function love.keypressed(key)
   if key == keys.quit then
     love.event.quit()
   elseif key == keys.play then
-    GAME_STATE = "play"
+    if GAME_STATE == GAME_FINISHED then
+      player1.score = 0
+      player2.score = 0
+      winner = nil
+      ball:reset()
+    end
+
+    GAME_STATE = GAME_PLAY
   elseif key == keys.reset then
-    GAME_STATE = "start"
+    GAME_STATE = GAME_START
+    winner = nil
 
     player1.score = 0
     player2.score = 0
@@ -76,12 +90,38 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
-  player1:update(dt)
-  player2:update(dt)
+  if GAME_STATE == GAME_PLAY then
+    player1:update(dt)
+    player2:update(dt)
 
-  if GAME_STATE == "play" then
     ball:update(dt)
     ball:handleVerticalBoundaryBounce()
+
+    local scorer = ball:checkHorizontalBoundaryCross()
+
+    if scorer == "left" then
+      player1.score = player1.score + 1
+
+      if player1.score >= WIN_SCORE then
+        winner = 1
+        GAME_STATE = GAME_FINISHED
+        return
+      end
+
+      ball:reset()
+      return
+    elseif scorer == "right" then
+      player2.score = player2.score + 1
+
+      if player2.score >= WIN_SCORE then
+        winner = 2
+        GAME_STATE = GAME_FINISHED
+        return
+      end
+
+      ball:reset()
+      return
+    end
 
     if ball:collides(player1) then
       ball:handlePaddleCollision(player1, "left")
@@ -95,18 +135,23 @@ function love.draw()
   push:start()
 
   love.graphics.clear(45 / 255, 50 / 255, 52 / 255, 1)
-  love.graphics.setFont(titleFont)
 
-  if GAME_STATE == "start" then
-    love.graphics.printf(title.text, title.x, title.y, title.width, title.align)
+  if GAME_STATE == GAME_START then
+    UIMessages.drawStart(config, WIN_SCORE)
   end
 
-  if GAME_STATE == "play" then
-    player1:drawScore()
-    player2:drawScore()
+  if GAME_STATE == GAME_PLAY or GAME_STATE == GAME_FINISHED then
+    UIMessages.drawScores(config, player1, player2)
+  end
+
+  if GAME_STATE == GAME_PLAY then
     player1:draw()
     player2:draw()
     ball:draw()
+  end
+
+  if GAME_STATE == GAME_FINISHED and winner ~= nil then
+    UIMessages.drawFinished(config, winner)
   end
 
   push:finish()

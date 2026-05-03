@@ -12,3 +12,6 @@
 - [ ] Load fonts in `love.load()` and apply distinct fonts for title vs score.
 - [ ] Add font config entries (asset path and size).
 - [ ] Add safe fallback to default Love2D font if custom font load fails.
+
+## Gameplay UX
+- [ ] Add warning/confirmation prompts when pressing reset or escape during an active game.
