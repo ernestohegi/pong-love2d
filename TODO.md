@@ -18,3 +18,4 @@
 ## Gameplay UX
 
 - [ ] Add warning/confirmation prompts when pressing reset or escape during an active game.
+- [ ] Prevent ball tunneling through paddles at high speed (use sub-stepping or swept collision detection).

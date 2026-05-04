@@ -8,35 +8,34 @@ local Sounds = require("src.sounds")
 local WIN_SCORE = config.game.rules.winScore
 local GAME_STATE = config.game.state.start
 
-local windowWidth, windowHeight =
-  config.game.window.width, config.game.window.height
-local keys = config.controls
+local controls = config.controls
+local entities = config.entities
 
 local player1 = Player.new(
-  config.entities.player1.x,
-  config.entities.player1.y,
-  config.entities.player1.width,
-  config.entities.player1.height,
-  config.entities.player1.keys,
-  config.entities.player1.scoreX,
-  config.entities.player1.scoreY
+  entities.player1.x,
+  entities.player1.y,
+  entities.player1.width,
+  entities.player1.height,
+  entities.player1.keys,
+  entities.player1.scoreX,
+  entities.player1.scoreY
 )
 
 local player2 = Player.new(
-  config.entities.player2.x,
-  config.entities.player2.y,
-  config.entities.player2.width,
-  config.entities.player2.height,
-  config.entities.player2.keys,
-  config.entities.player2.scoreX,
-  config.entities.player2.scoreY
+  entities.player2.x,
+  entities.player2.y,
+  entities.player2.width,
+  entities.player2.height,
+  entities.player2.keys,
+  entities.player2.scoreX,
+  entities.player2.scoreY
 )
 
 local ball = Ball.new(
-  config.game.width / 2 - config.entities.ball.width / 2,
-  config.game.height / 2 - config.entities.ball.height / 2,
-  config.entities.ball.width,
-  config.entities.ball.height
+  config.game.width / 2 - entities.ball.width / 2,
+  config.game.height / 2 - entities.ball.height / 2,
+  entities.ball.width,
+  entities.ball.height
 )
 
 local function drawStartState()
@@ -87,9 +86,9 @@ local function handleResetKey()
 end
 
 local keyHandlers = {
-  [keys.quit] = handleQuitKey,
-  [keys.play] = handlePlayKey,
-  [keys.reset] = handleResetKey,
+  [controls.quit] = handleQuitKey,
+  [controls.play] = handlePlayKey,
+  [controls.reset] = handleResetKey,
 }
 
 local function handlePaddleHit(player, side)
@@ -108,8 +107,6 @@ local function awardPoint(player)
   end
 
   ball:reset()
-
-  return true
 end
 
 function love.load()
@@ -131,8 +128,8 @@ function love.load()
   push:setupScreen(
     config.game.width,
     config.game.height,
-    windowWidth,
-    windowHeight,
+    config.game.window.width,
+    config.game.window.height,
     { pixelperfect = false }
   )
 end
@@ -150,32 +147,34 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
-  dt = math.min(dt, 1 / 30)
+  local updatedDT = math.min(dt, 1 / 30)
 
-  if GAME_STATE == config.game.state.play then
-    player1:update(dt)
-    player2:update(dt)
-    ball:update(dt)
+  if GAME_STATE ~= config.game.state.play then
+    return
+  end
 
-    if ball:handleVerticalBoundaryBounce() then
-      Sounds.playVerticalBounce()
-    end
+  player1:update(updatedDT)
+  player2:update(updatedDT)
+  ball:update(updatedDT)
 
-    local scorer = ball:checkHorizontalBoundaryCross()
+  if ball:handleVerticalBoundaryBounce() then
+    Sounds.playVerticalBounce()
+  end
 
-    if scorer == "left" then
-      awardPoint(player1)
-      return
-    elseif scorer == "right" then
-      awardPoint(player2)
-      return
-    end
+  local scorer = ball:checkHorizontalBoundaryCross()
 
-    if ball:collides(player1) then
-      handlePaddleHit(player1, "left")
-    elseif ball:collides(player2) then
-      handlePaddleHit(player2, "right")
-    end
+  if scorer == "left" then
+    awardPoint(player1)
+    return
+  elseif scorer == "right" then
+    awardPoint(player2)
+    return
+  end
+
+  if ball:collides(player1) then
+    handlePaddleHit(player1, "left")
+  elseif ball:collides(player2) then
+    handlePaddleHit(player2, "right")
   end
 end
 
