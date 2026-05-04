@@ -37,6 +37,8 @@ local config = {
     },
     sounds = {
       paddleHit = "assets/sounds/impactWood_light_000.ogg",
+      verticalBounce = "assets/sounds/error_005.ogg",
+      score = "assets/sounds/confirmation_001.ogg",
     },
   },
   ui = {

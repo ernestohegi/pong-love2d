@@ -2,6 +2,12 @@ local config = require("src.config")
 
 local Ball = {}
 Ball.__index = Ball
+local verticalBounceSound = nil
+
+function Ball.loadAudio()
+  verticalBounceSound = love.audio.newSource(config.audio.sounds.verticalBounce, "static")
+  verticalBounceSound:setVolume(config.audio.volume.sfx)
+end
 
 function Ball.new(x, y, width, height)
   local self = setmetatable({
@@ -41,12 +47,22 @@ function Ball:handlePaddleCollision(paddle, side)
 end
 
 function Ball:handleVerticalBoundaryBounce()
+  local bounced = false
+
   if self.y <= 0 then
     self.y = 0
     self.dy = -self.dy
+
+    bounced = true
   elseif self.y + self.height >= config.game.height then
     self.y = config.game.height - self.height
     self.dy = -self.dy
+
+    bounced = true
+  end
+
+  if bounced and verticalBounceSound ~= nil then
+    love.audio.play(verticalBounceSound:clone())
   end
 end
 
@@ -69,7 +85,8 @@ function Ball:reset()
 
   self.x = config.game.width / 2 - self.width / 2
   self.y = config.game.height / 2 - self.height / 2
-  self.dx = (math.random(2) == 1 and config.tuning.ball.speedX or -config.tuning.ball.speedX) * speedScale
+  self.dx = (math.random(2) == 1 and config.tuning.ball.speedX or -config.tuning.ball.speedX)
+    * speedScale
   self.dy = math.random(config.tuning.ball.speedYMin, config.tuning.ball.speedYMax) * speedScale
 end
 

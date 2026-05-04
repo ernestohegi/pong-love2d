@@ -8,6 +8,7 @@ local WIN_SCORE = config.game.rules.winScore
 local GAME_STATE = config.game.state.start
 
 local winner = nil
+local scoreSound = nil
 
 local windowWidth, windowHeight = config.game.window.width, config.game.window.height
 local keys = config.controls
@@ -44,6 +45,9 @@ function love.load()
 
   UI.load(config)
   Player.loadAudio()
+  Ball.loadAudio()
+  scoreSound = love.audio.newSource(config.audio.sounds.score, "static")
+  scoreSound:setVolume(config.audio.volume.sfx)
 
   math.randomseed(os.time())
 
@@ -99,6 +103,7 @@ function love.update(dt)
 
     if scorer == "left" then
       player1.score = player1.score + 1
+      love.audio.play(scoreSound:clone())
 
       if player1.score >= WIN_SCORE then
         winner = 1
@@ -110,6 +115,7 @@ function love.update(dt)
       return
     elseif scorer == "right" then
       player2.score = player2.score + 1
+      love.audio.play(scoreSound:clone())
 
       if player2.score >= WIN_SCORE then
         winner = 2

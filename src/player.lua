@@ -30,6 +30,7 @@ function Player:update(dt)
   elseif love.keyboard.isDown(self.keys.down) then
     self.y = self.y + paddleSpeed * dt
   end
+
   self.y = math.max(0, math.min(self.y, config.game.height - self.height))
 end
 
