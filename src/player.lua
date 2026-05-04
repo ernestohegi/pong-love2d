@@ -3,13 +3,6 @@ local config = require("src.config")
 local Player = {}
 Player.__index = Player
 
-local paddleHitSound = nil
-
-function Player.loadAudio()
-  paddleHitSound = love.audio.newSource(config.audio.sounds.paddleHit, "static")
-  paddleHitSound:setVolume(config.audio.volume.sfx)
-end
-
 function Player.new(x, y, width, height, keys, scoreX, scoreY)
   return setmetatable({
     x = x,
@@ -37,12 +30,6 @@ end
 
 function Player:draw()
   love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
-end
-
-function Player:playHitSound()
-  if paddleHitSound ~= nil then
-    love.audio.play(paddleHitSound:clone())
-  end
 end
 
 return Player

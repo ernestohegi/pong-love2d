@@ -3,13 +3,6 @@ local config = require("src.config")
 local Ball = {}
 Ball.__index = Ball
 
-local verticalBounceSound = nil
-
-function Ball.loadAudio()
-  verticalBounceSound = love.audio.newSource(config.audio.sounds.verticalBounce, "static")
-  verticalBounceSound:setVolume(config.audio.volume.sfx)
-end
-
 function Ball.new(x, y, width, height)
   local self = setmetatable({
     x = x,
@@ -62,9 +55,7 @@ function Ball:handleVerticalBoundaryBounce()
     bounced = true
   end
 
-  if bounced and verticalBounceSound ~= nil then
-    love.audio.play(verticalBounceSound:clone())
-  end
+  return bounced
 end
 
 function Ball:checkHorizontalBoundaryCross()
