@@ -43,6 +43,7 @@ function love.load()
   love.graphics.setDefaultFilter("nearest", "nearest")
 
   UI.load(config)
+  Player.loadAudio()
 
   math.randomseed(os.time())
 
@@ -122,8 +123,10 @@ function love.update(dt)
 
     if ball:collides(player1) then
       ball:handlePaddleCollision(player1, "left")
+      player1:playHitSound()
     elseif ball:collides(player2) then
       ball:handlePaddleCollision(player2, "right")
+      player2:playHitSound()
     end
   end
 end

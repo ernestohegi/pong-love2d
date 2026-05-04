@@ -31,6 +31,14 @@ local config = {
     play = "return",
     reset = "space",
   },
+  audio = {
+    volume = {
+      sfx = 0.5,
+    },
+    sounds = {
+      paddleHit = "assets/sounds/impactWood_light_000.ogg",
+    },
+  },
   ui = {
     layout = {
       verticalRythm = 16 * 1.5,

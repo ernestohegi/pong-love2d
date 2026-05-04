@@ -25,8 +25,9 @@ end
 
 function UI.drawScores(config, player1, player2)
   love.graphics.setFont(fonts.score)
-  player1:drawScore()
-  player2:drawScore()
+  love.graphics.print(tostring(player1.score), player1.scoreX, player1.scoreY)
+  love.graphics.print(tostring(player2.score), player2.scoreX, player2.scoreY)
+
   UI.drawScoreLabels(config, player1, player2)
 end
 
