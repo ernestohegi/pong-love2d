@@ -113,3 +113,7 @@ Alternatively, drag the game folder onto `love.exe`.
 - LÖVE documentation: https://love2d.org/wiki/Main_Page
 - LÖVE GitHub: https://github.com/love2d/love
 - push library: https://github.com/Ulydev/push
+
+## Audio credits
+
+- Sound effects in `assets/sounds/` were added from [Kenney](https://kenney.nl/assets).

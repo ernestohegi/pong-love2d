@@ -2,6 +2,7 @@ local config = require("src.config")
 
 local Ball = {}
 Ball.__index = Ball
+
 local verticalBounceSound = nil
 
 function Ball.loadAudio()
