@@ -40,6 +40,24 @@ local ball = Ball.new(
   config.entities.ball.height
 )
 
+local function awardPoint(player, playerNum)
+  player.score = player.score + 1
+
+  if scoreSound ~= nil then
+    scoreSound:stop()
+    scoreSound:play()
+  end
+
+  if player.score >= WIN_SCORE then
+    winner = playerNum
+    GAME_STATE = config.game.state.finished
+    return true
+  end
+
+  ball:reset()
+  return true
+end
+
 function love.load()
   love.graphics.setDefaultFilter("nearest", "nearest")
 
@@ -49,7 +67,7 @@ function love.load()
   scoreSound = love.audio.newSource(config.audio.sounds.score, "static")
   scoreSound:setVolume(config.audio.volume.sfx)
 
-  math.randomseed(os.time())
+  love.math.setRandomSeed(os.time() + love.timer.getTime())
 
   love.window.setTitle(config.game.window.title)
 
@@ -66,6 +84,10 @@ function love.load()
     windowHeight,
     { pixelperfect = false }
   )
+end
+
+function love.resize(w, h)
+  push:resize(w, h)
 end
 
 function love.keypressed(key)
@@ -92,6 +114,8 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
+  dt = math.min(dt, 1 / 30)
+
   if GAME_STATE == config.game.state.play then
     player1:update(dt)
     player2:update(dt)
@@ -102,28 +126,10 @@ function love.update(dt)
     local scorer = ball:checkHorizontalBoundaryCross()
 
     if scorer == "left" then
-      player1.score = player1.score + 1
-      love.audio.play(scoreSound:clone())
-
-      if player1.score >= WIN_SCORE then
-        winner = 1
-        GAME_STATE = config.game.state.finished
-        return
-      end
-
-      ball:reset()
+      awardPoint(player1, 1)
       return
     elseif scorer == "right" then
-      player2.score = player2.score + 1
-      love.audio.play(scoreSound:clone())
-
-      if player2.score >= WIN_SCORE then
-        winner = 2
-        GAME_STATE = config.game.state.finished
-        return
-      end
-
-      ball:reset()
+      awardPoint(player2, 2)
       return
     end
 

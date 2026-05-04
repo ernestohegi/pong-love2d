@@ -2,6 +2,7 @@ local config = require("src.config")
 
 local Player = {}
 Player.__index = Player
+
 local paddleHitSound = nil
 
 function Player.loadAudio()
