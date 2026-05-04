@@ -97,7 +97,10 @@ function push:setCanvas(name)
     return true
   end
   local canvasTable = self:getCanvasTable(name)
-  return love.graphics.setCanvas({ canvasTable.canvas, stencil = canvasTable.stencil })
+  return love.graphics.setCanvas({
+    canvasTable.canvas,
+    stencil = canvasTable.stencil,
+  })
 end
 function push:getCanvasTable(name)
   for i = 1, #self.canvases do
@@ -148,7 +151,10 @@ end
 function push:start()
   if self._canvas then
     love.graphics.push()
-    love.graphics.setCanvas({ self.canvases[1].canvas, stencil = self.canvases[1].stencil })
+    love.graphics.setCanvas({
+      self.canvases[1].canvas,
+      stencil = self.canvases[1].stencil,
+    })
   else
     love.graphics.translate(self._OFFSET.x, self._OFFSET.y)
     love.graphics.setScissor(
@@ -213,7 +219,10 @@ function push:finish(shader)
       if not _table.private then
         local _canvas = _table.canvas
         local _shader = _table.shader
-        self:applyShaders(_canvas, type(_shader) == "table" and _shader or { _shader })
+        self:applyShaders(
+          _canvas,
+          type(_shader) == "table" and _shader or { _shader }
+        )
       end
     end
     love.graphics.setCanvas()
@@ -223,7 +232,10 @@ function push:finish(shader)
     local shader = shader or _render.shader
     love.graphics.push()
     love.graphics.scale(self._SCALE.x, self._SCALE.y)
-    self:applyShaders(_render.canvas, type(shader) == "table" and shader or { shader })
+    self:applyShaders(
+      _render.canvas,
+      type(shader) == "table" and shader or { shader }
+    )
     love.graphics.pop()
 
     --clear canvas
@@ -248,8 +260,11 @@ function push:toGame(x, y)
   x, y = x - self._OFFSET.x, y - self._OFFSET.y
   local normalX, normalY = x / self._GWIDTH, y / self._GHEIGHT
 
-  x = (x >= 0 and x <= self._WWIDTH * self._SCALE.x) and normalX * self._WWIDTH or nil
-  y = (y >= 0 and y <= self._WHEIGHT * self._SCALE.y) and normalY * self._WHEIGHT or nil
+  x = (x >= 0 and x <= self._WWIDTH * self._SCALE.x) and normalX * self._WWIDTH
+    or nil
+  y = (y >= 0 and y <= self._WHEIGHT * self._SCALE.y)
+      and normalY * self._WHEIGHT
+    or nil
 
   return x, y
 end
